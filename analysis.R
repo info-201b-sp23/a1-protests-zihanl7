@@ -24,11 +24,16 @@
 
 # In this section, you will load the CountLove data and necessary packages.
 
-# (1.a) Load the `stringr` package, which you will use later.
-
+# (1.a) Load the (`stringr`) package, which you will use later.
+install.packages("stringr")
+library("stringr")
 # (1.b) Load the data from CountLove by using the following URL:
 # https://countlove.org/data/data.csv
 # Save this dataframe into a variable called `protest_data`
+
+protest_data<-https://countlove.org/data/data.csv
+data <- read.csv(protest_data)
+View(data)
 
 #  Whenever we load data, the first thing we want to do is manually examine it,
 # see how it looks, and make sure we understand what each column (or feature)
@@ -39,60 +44,80 @@
 # (1.c) Without using code, look at all the the column names in the dataset, and
 # then type each column name in the comment below, with each column name
 # separated by a comma.
-# Column 1, Column 2, Column 3...
-
+# Column 1, Column 2,  Column 3,        Column 4,          Column 5,  Column 6,  Column 7,      Column 8
+  Data    Locations    attendees.  Even...legacy..see..tags.  tags.     curated   Sources.   Total.Articles
 # (1.d) Without using code, pick one row in the dataset (any row!), and then
 # type in all the values from that row, with each value separated by a comma.
 # For ex: 2018-01-01, University of Washington, Seattle, WA...
+  
+2017-01-15, Bowie State University, Bowie, MD, 1500, Healthcare, Healthcare; For Affordable Care Act, Yes,http://www.capitalgazette.com/news/ph-ac-cn-aca-rally-0116-20170115-story.html,1
 
+  
 # (1.e) How many protests are recorded in the dataset in total? Use an R
 # function to determine this number and then save it in a variable called
 # `num_protests`
 # Hint: This is the same number as the number of rows in the dataset!
-
+num_protests <- nrow(data)
+There are 38097 protests are recorded in the dataset in total.
 # (1.f) How many features (or columns) are recorded for each protest? It's
 # important to know how to find this number programmatically as well as manually
 # Save the number of features for each protest in a variable called
 # `num_features`
-
+num_features <- ncol(data)
+There are 8 features are recorded for each protest.
 ## Part 2: Attendees (12 points) -----------------------------------------------
 # In this part, you will explore the number of people who participated in the protests
 
 # (2.a) Extract the `Attendees` column into a variable called `num_attendees`
 
+num_attendees <- data$Attendees
+
 # (2.b) What is the fewest number of attendees at a protest?
 # Save the number of protests in a variable called `min_attendees`
 # Hint: Remember to exclude NA values when using the functions below!
 
+min_attendees <- min(num_attendees, na.rm = TRUE)
+The minimum number of attendees is 0.
+
 # (2.c) What is the greatest number of attendees at a protest?
 # Save the number of protests in a variable called `max_attendees`
 
+max_attendees <- max(num_attendees, na.rm = TRUE)
+The maximum number of attendees is 725000.
 
 # (2.d) What is the average (mean) number of attendees at a protest?
 # Save the number of protests in a variable called `mean_attendees`
 
+mean_attendees <- mean(num_attendees, na.rm = TRUE)
+The average number of attendees is about 643.
 
 # (2.e) What is the median number of attendees?
 # Save the number of protests in a variable called `median_attendees`
 
+median_attendees <- median(num_attendees, na.rm = TRUE)
+The median attendees is 100
 
 # (2.f) What is the difference between the mean and median number of attendees?
 # Subtract median_attendees from mean_attendees
 # Save the difference in a variable called `difference_attendees`
 
+difference_attendees <- mean_attendees - median_attendees
+The difference attendees is about 543.
+
 # Reflection 1 (answer in the README.md file)
 # Why do you think the mean is higher than the median? Which metric would you
 # use in a report about this data, and why?
-
 
 ## Part 3: Locations (20 points) -----------------------------------------------
 # In this part, you will explore where protests happened.
 
 # (3.a) Extract the `Location` column into a variable called `locations`
+location <- data$Location
 
 # (3.b) How many *unique* locations are in the dataset?
 # Save the NUMBER of unique locations in a variable called `num_locations`
 
+num_locations <- length(unique(location))
 
 # (3.c) How many protests occurred in the state of Washington?
 # Use a function from the stringr package to detect the letters "WA" in the
@@ -100,11 +125,16 @@
 # Then, calculate the number of protests recorded in Washington
 # Save the NUMBER of WA locations in a variable called `num_in_wa`
 
+library(stringr)
+wa_protests <- data[str_detect(data$Location, "WA"), ]
+num_in_wa <- nrow(wa_protests)
+
 
 # (3.d) What proportion of protests occurred in Washington?
 # Divide the number of protests in Washington by the total number of protests
 # Save this proportion in a variable called `prop_in_wa`
 
+prop_in_wa <- num_in_wa / num_protests
 
 # (3.e) Now, using the same stringr function and building on the code that
 # you've written above, write a function `count_protests_in_location()` that
@@ -115,17 +145,36 @@
 # If the location is not found in the dataset, the function should return the
 # sentence: "Sorry, that location is not found."
 
+count_protests_in_location <- function(location) {
+  wa_protests <- data[str_detect(data$Location, "WA"), ]
+  num_in_location <- nrow(wa_protests)
+  
+  if (num_in_location > 0) {
+    sentence <- paste("There were", num_in_location, "protests in", location, ".")
+  } else {
+    sentence <- paste("Sorry, that location is not found.")
+  }
+  
+  return(sentence)
+}
+
 # (3.f) Use your `count_protests_in_location()` function above to compute the
 # number of protests in "Washington, DC" and return the resulting message
 # Save the resulting message in a variable called `dc_summary`
+
+dc_summary <- count_protests_in_location("Washington, DC")
 
 # (3.g) Use your function above to compute the number of protests in
 # "Minneapolis" and return the resulting message
 # # Save the resulting message in a variable called `minneapolis_summary`
 
+minneapolis_summary <- count_protests_in_location("Minneapolis")
+
 # (3.h) Let's try to find out how many protests occurred in each state. To do
 # so, first use a stringr function to extract the last 2 characters from every
 # location and use these 2 characters to create a new vector called `states`
+
+states <- str_sub(data$Location, start = -2)
 
 # (3.i) What are the unique states are in the dataset? Create a vector of just the
 # unique states in the dataset
@@ -134,10 +183,14 @@
 # state abbreviations, such as "CE." YOU DO NOT NEED TO FIX THIS, but you may
 # reflect to yourself on why this might be happening.
 
+uniq_states <- unique(states)
+  
 # (3.j) Now apply your `count_protests_in_location` function to every state in
 # `uniq_states` by using the `sapply()` function.
 # Store all your messages in a variable called `state_summary`
 
+state_summary <- sapply(uniq_states, count_protests_in_location)
+  
 ## Part 4: Dates (16 points) ---------------------------------------------------
 # In this part, you will explore *when* protests happened.
 
@@ -145,31 +198,46 @@
 # `as.Date()` function.
 # Save this value in a variable called `dates`
 
+dates <- as.Date(data$Date)
+
+
 # (4.b) What is the most recent date in the dataset?
 # Store this value in a variable called `most_recent_protest`
 
+most_recent_protest <- max(dates)
+
 # (4.c) What is the earliest date in the dataset?
 # Store this value in a variable called `earliest_protest`
+
+earliest_protest <- min(dates)
 
 # (4.d) What is the timespan of the dataset — in other words, the distance
 # between the earliest protest and most recent protest?
 # Hint: R can do math with dates pretty well by default!
 # Store this value in a variable called `time_span`
 
+time_span <- most_recent_protest - earliest_protest
+
 # (4.e) Now, create a vector of only the dates that are in 2020.
 # Note: If you want only dates after a certain start date, you can use
 # "2020-01-01" with comparison operators (==, >=, <=)
 # Store this value in a variable called `protests_in_2020`
+
+protests_in_2020 <- dates[dates >= as.Date("2020-01-01") & dates <= as.Date("2020-12-31")]
 
 # (4.f) Create a vector of only the dates that are in 2019.
 # Note: If you want only dates after a certain start date, you can use
 # "2020-01-01" with comparison operators (==, >=, <=)
 # Store this value in a variable called `protests_in_2019`
 
+protests_in_2019 <- dates[dates >= as.Date("2019-01-01") & dates <= as.Date("2019-12-31")]
+
 # (4.g) Create a vector of only the dates that are in 2018.
 # Note: If you want only dates after a certain start date, you can use
 # "2020-01-01" with comparison operators (==, >=, <=)
 # Store this value in a variable called `protests_in_2018`
+
+protests_in_2018 <- dates[dates >= as.Date("2018-01-01") & dates <= as.Date("2018-12-31")]
 
 # Reflection 2 (answer in the README.md file)
 # When we're doing data analysis work, we always want to test our assumptions
@@ -179,16 +247,24 @@
 # Guess: Do you think there were more protests in 2019 than in 2018? Why or why not?
 # Guess: Do you think there were more protests in 2020 than in 2019? Why or why not?
 
+I think there were more protests in 2019 than in 2018, because as the there are more social issue appear between 2018 and 2019, the protest might increase.
+
+I think there were more protests in 2020 than in 2019, because the COVID-19 problem arise during that period of time, people are strggule of dealing this issue.
 
 # (4.h) Now use the length() function to find out how many protests happened in
 # 2018 vs. 2019 vs. 2020. 
 # Save them in the varaibles `num_protests_in_2018`, `num_protests_in_2019`,
 # `num_protests_in_2020`
 
+num_protests_in_2018 <- length(protests_in_2018)
+num_protests_in_2019 <- length(protests_in_2019)
+num_protests_in_2020 <- length(protests_in_2020)
+
 # Reflection 3 (answer in the README.md file)
 # Does the change in the number of protests from 2018 to 2019 to 2020 surprise
 # you? Why or why not? What do you think explains the fluctuation?
 
+The number of protests from 2018 to 2019 to 2020 does not surprise me, because the data shows the number of protests during the 3 time increase. This might caused by the increase of political issue, public events and so on.
 
 ## Part 5: Protest Purpose (6 points) ------------------------------------------
 # In this section, you will explore *why* the protests happened.
@@ -196,9 +272,12 @@
 # (5.a) Extract the `Event..legacy..see.tags.` column into a variable called
 # `purposes`
 
+purposes <- data$Event..legacy..see.tags.
+
 # (5.b) How many different unique purposes are listed in the dataset?
 # Save this NUMBER in a variable called `num_purposes`
-
+num_purposes <- length(unique(data$Purpose))
+View(purposes)
 # That's quite a few! Use View() to examine the `purposes` vector. You will
 # notice a common pattern for each purpose, formatted something like this: Civil
 # Rights (Transgender Rights)
@@ -207,7 +286,7 @@
 # Rights" and not "(Transgender Rights)"), we're going to use some R functions
 # to extract only the text before the parenthesis and then save them in a
 # variable `high_level_purposes`
-
+high_level_purposes <- gsub("\\s*\\(.*", "", purposes)
 # There are some built-in R functions where you can replace text using regular
 # expressions.
 # Regular expressions are a special syntax that lets you match patterns.
@@ -223,7 +302,8 @@ trimws(" hello ")
  
 
 # Make a table of your `high_level_protests` by using table() and then View() it
- 
+high_level_table <- table(high_level_purposes)
+View(high_level_table)
 # Reflection 4 (answer in README.md file): What is the first and fourth most
 # frequent category of protest? Do these frequencies align with your sense of
 # the major protest movements in the U.S. in the last few years? Why or why not? (3 points)
